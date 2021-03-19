@@ -39,7 +39,7 @@ yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "uixo:mint"
+yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "uixo:mint,xusd:mint"
 yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "uixo:mint/burn/transfer,uxgbp:mint/burn/transfer"
 yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:transfer,rez:transfer"
 
