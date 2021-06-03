@@ -46,24 +46,34 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 		var req SignDataReq
 
 		body, err := ioutil.ReadAll(r.Body)
-		if rest.CheckBadRequestError(w, err){
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		err = clientCtx.LegacyAmino.UnmarshalJSON(body, &req)
-		if rest.CheckBadRequestError(w, err){
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msgBytes, err := hex.DecodeString(strings.TrimPrefix(req.Msg, "0x"))
-		if rest.CheckInternalServerError(w, err){
+		if rest.CheckInternalServerError(w, err) {
 			return
 		}
 
 		var msg sdk.Msg
-		err = clientCtx.LegacyAmino.UnmarshalJSON(msgBytes, &msg)
-		if rest.CheckBadRequestError(w, err){
-			return
+		if strings.HasPrefix(string(msgBytes), "{\"type\":\"project/CreateProject\"") {
+			var msgCreateProject projecttypes.MsgCreateProject
+			err = clientCtx.LegacyAmino.UnmarshalJSON(msgBytes, &msgCreateProject)
+			if rest.CheckBadRequestError(w, err) {
+				return
+			}
+
+			msg = &msgCreateProject
+		} else {
+			err = clientCtx.LegacyAmino.UnmarshalJSON(msgBytes, &msg)
+			if rest.CheckBadRequestError(w, err) {
+				return
+			}
 		}
 
 		// all messages must be of type ixo.IxoMsg
@@ -75,7 +85,7 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 
 		output := SignDataResponse{}
 
-		switch ixoMsg.Type(){
+		switch ixoMsg.Type() {
 		// TODO (Stef) Case not working
 		case projecttypes.TypeMsgCreateProject:
 			var stdSignMsg legacytx.StdSignMsg
@@ -83,7 +93,7 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 				projecttypes.MsgCreateProjectTotalFee)
 
 			output.SignBytes = string(stdSignMsg.Bytes())
-			output.Fee       = stdSignMsg.Fee
+			output.Fee = stdSignMsg.Fee
 		default:
 			// Deduce and set signer address
 			signerAddress := didexported.VerifyKeyToAddr(req.PubKey)
@@ -132,13 +142,12 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 
 			// Produce response from sign bytes and fees
 			output.SignBytes = string(bytes)
-			output.Fee       = stdFee
+			output.Fee = stdFee
 		}
 
 		rest.PostProcessResponseBare(w, clientCtx, output)
 	}
 }
-
 
 type (
 	// DecodeReq defines a tx decoding request.
