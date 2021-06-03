@@ -61,7 +61,7 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		var msg sdk.Msg
-		if strings.HasPrefix(string(msgBytes), "{\"type\":\"project/CreateProject\"") {
+		if strings.Contains(string(msgBytes), "project/CreateProject") {
 			var msgCreateProject projecttypes.MsgCreateProject
 			err = clientCtx.LegacyAmino.UnmarshalJSON(msgBytes, &msgCreateProject)
 			if rest.CheckBadRequestError(w, err) {
