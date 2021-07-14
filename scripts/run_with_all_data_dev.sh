@@ -23,17 +23,17 @@ yes $PASSWORD | ixod keys add fee4
 yes $PASSWORD | ixod keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd,1000000000000uxgbp
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 10000000000000uixo,10000000000000res,10000000000000rez,10000000000000uxgbp
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 10000000000000uixo,10000000000000res,10000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 10000000000000uixo,10000000000000res,10000000000000rez
 
 # Add pubkey-based genesis accounts
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
 FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt's pubkey
 SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ's pubkey
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
-yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
-yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 10000000000000uixo,10000000000000res,10000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 10000000000000uixo,10000000000000res,10000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 10000000000000uixo,10000000000000res,10000000000000rez
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"

@@ -58,6 +58,18 @@ BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #  }
 #}'
 
+XUSD_BOND_DID="did:ixo:PU7EJ8mGDczJJunSe5TTng"
+#XUSD_BOND_DID_FULL='{
+#  "did":"did:ixo:PU7EJ8mGDczJJunSe5TTng",
+#  "verifyKey":"DFEo3YWTzuGtS5pQUwDxp1U9T9hoZpU1hMyicfmq9TYS",
+#  "encryptionPublicKey":"EpsJw3cg5jX5mLja1ztN9pWkEJNPUvPUozfvFTBCWP6f",
+#  "secret":{
+#    "seed":"abef9ae93345dfd8894833d8b9f1757434b4ee23322a4e9d7fc988e3138f3f1e",
+#    "signKey":"CaAdD9ZShDUVVeTYu7cGq6dT1RJk5hZBA9NGeARjCqZ7",
+#    "encryptionPrivateKey":"CaAdD9ZShDUVVeTYu7cGq6dT1RJk5hZBA9NGeARjCqZ7"
+#  }
+#}'
+
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"
 FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y"
 SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"
@@ -136,11 +148,33 @@ ixod_tx bonds create-bond \
 echo "Created bond..."
 ixod_q bonds bond "$BOND_DID"
 
-# TODO: treasury module no longer exists
-#echo "Minting 1000000xUSD tokens to Miguel using Miguel oracle..."
-#ixod_tx treasury oracle-mint "$MIGUEL_DID" 1000000000000xusd "$MIGUEL_DID_FULL" "dummy proof"
-#echo "Minting 1000000xUSD tokens to Francesco using Miguel oracle..."
-#ixod_tx treasury oracle-mint "$FRANCESCO_DID" 1000000000000xusd "$MIGUEL_DID_FULL" "dummy proof"
+echo "Creating xUSD bond..."
+ixod_tx bonds create-bond \
+  --token=xusd \
+  --name="xUSD Minting Bond" \
+  --description="Bond for minting xUSD tokens" \
+  --function-type=power_function \
+  --function-parameters="m:1,n:0.000000000000000001,c:0" \
+  --reserve-tokens=uixo \
+  --tx-fee-percentage=0 \
+  --exit-fee-percentage=0 \
+  --fee-address="$FEE" \
+  --max-supply=10000000000000xusd \
+  --order-quantity-limits="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
+  --allow-sells \
+  --batch-blocks=1 \
+  --bond-did="$XUSD_BOND_DID" \
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID"
+echo "Created bond..."
+ixod_q bonds bond "$XUSD_BOND_DID"
+
+echo "Minting 1000000USD tokens to Miguel using the xUSD bond..."
+ixod_tx bonds buy 1000000000000xusd 1000000000001uixo "$XUSD_BOND_DID" "$MIGUEL_DID_FULL"
+echo "Minting 1000000USD tokens to Francesco using the xUSD bond..."
+ixod_tx bonds buy 1000000000000xusd 1000000000001uixo "$XUSD_BOND_DID" "$FRANCESCO_DID_FULL"
 
 echo "Miguel buys 60000edu... [[founder allocation]]"
 ixod_tx bonds buy 60000edu 60000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
