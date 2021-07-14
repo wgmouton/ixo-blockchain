@@ -26,10 +26,10 @@ BOND_1_DID="did:ixo:75SZoisuNpsDezmYURaBb7"
 #  "pubkey": "ixopub1addwnpepq2f3l9ndxzhx9dmp6qs6rj6jtsmhlwuggsmmkkg7dv5t37hyr3amv8qaarl",
 #  "mnemonic": "holiday soul coin patrol naive blood blossom unique grid among work alpha mountain garlic mesh animal fire scissors secret kind flee satisfy summer roof"
 #}
-ixocli keys add fee1 --recover
-FEE_1=$(yes $PASSWORD | ixocli keys show fee1 -a)
+ixod keys add fee1 --recover
+FEE_1=$(yes $PASSWORD | ixod keys show fee1 -a)
 
-ixocli tx bonds create-bond \
+ixod tx bonds create-bond \
   --token=edutest \
   --name="Chimple Pilot DIB" \
   --description="Chimple Pilot DIB alpha bond" \
@@ -77,7 +77,7 @@ BOND_2_DID="did:ixo:49BSStn5nAwrfZwvGT6HFa"
 ixocli keys add fee2 --recover
 FEE_2=$(yes $PASSWORD | ixocli keys show fee2 -a)
 
-ixocli tx bonds create-bond \
+ixod tx bonds create-bond \
   --token=abctest \
   --name="Relayer ABC Campaign" \
   --description="Chimple Pilot DIB augmented bonding curve" \

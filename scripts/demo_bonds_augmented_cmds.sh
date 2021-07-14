@@ -26,10 +26,10 @@ BOND_1_DID="did:ixo:WnRkS9irrycaQNV3txyWUy"
 #  "pubkey": "ixopub1addwnpepqtvv8rjgatzl7r2fmef53dvamdn3xj4dkrj2qgh5h27prm788l0f5lcfcwv",
 #  "mnemonic": "away burden flip leader scout suit course yellow hill donor sell wait guard baby frog assault tray disagree snack horse bean hedgehog leg purity"
 #}
-ixocli keys add fee1 --recover
-FEE_1=$(yes $PASSWORD | ixocli keys show fee1 -a)
+ixod keys add fee1 --recover
+FEE_1=$(yes $PASSWORD | ixod keys show fee1 -a)
 
-ixocli tx bonds create-bond \
+ixod tx bonds create-bond \
   --token=edu \
   --name="Chimple Pilot DIB" \
   --description="Chimple Pilot DIB alpha bond" \
@@ -74,10 +74,10 @@ BOND_2_DID="did:ixo:PU7EJ8mGDczJJunSe5TTng"
 #  "pubkey": "ixopub1addwnpepqg252zaxsmv9gj372u99ezmthqls6xa7ve5uyart5p7tml3pgks6czg8kn3",
 #  "mnemonic": "stone poem affair brisk gather circle elevator cabin add discover wish cycle other census wreck scene unique tiger moon title cable balcony human equal"
 #}
-ixocli keys add fee2 --recover
-FEE_2=$(yes $PASSWORD | ixocli keys show fee2 -a)
+ixod keys add fee2 --recover
+FEE_2=$(yes $PASSWORD | ixod keys show fee2 -a)
 
-ixocli tx bonds create-bond \
+ixod tx bonds create-bond \
   --token=abcc \
   --name="Relayer ABC Campaign" \
   --description="Chimple Pilot DIB augmented bonding curve" \

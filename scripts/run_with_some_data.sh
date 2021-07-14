@@ -8,11 +8,11 @@ yes 'y' | ixod keys delete miguel --force
 yes $PASSWORD | ixod keys add miguel
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd,1000000000000uxgbp
 
 # Add pubkey-based genesis accounts
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000xusd
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
