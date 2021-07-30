@@ -141,7 +141,7 @@ ixod_tx bonds create-bond \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
   --alpha-bond \
-  --allow-sells \
+  --allow-reserve-withdrawals \
   --batch-blocks=1 \
   --outcome-payment="68100000000" \
   --bond-did="$BOND_DID" \
