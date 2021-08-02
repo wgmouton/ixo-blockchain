@@ -115,14 +115,14 @@ ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering DID 3/3..."
 ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 
-# d0 := 60000000000   // initial raise (reserve)
-# p0 := 1000000       // initial price (reserve per token)
-# theta := 0          // initial allocation (percentage)
-# kappa := 3          // degrees of polynomial (i.e. x^2, x^4, x^6)
+# d0 := 1000000  // initial raise (reserve)
+# p0 := 1000000  // initial price (reserve per token)
+# theta := 0     // initial allocation (percentage)
+# kappa := 3     // degrees of polynomial (i.e. x^2, x^4, x^6)
 
-# R0 = 60000000000    // initial reserve (1-theta)*d0
-# S0 = 60000          // initial supply
-# V0 = 3600           // invariant
+# R0 = 1000000   // initial reserve (1-theta)*d0
+# S0 = 1         // initial supply
+# V0 = 0.000001  // invariant
 
 echo "Creating bond..."
 ixod_tx bonds create-bond \
@@ -130,7 +130,7 @@ ixod_tx bonds create-bond \
   --name="Chimple Pilot DIB" \
   --description="Chimple Pilot DIB alpha bond" \
   --function-type=augmented_function \
-  --function-parameters="d0:60000000000,p0:1000000,theta:0,kappa:3" \
+  --function-parameters="d0:1000000,p0:1000000,theta:0,kappa:3" \
   --reserve-tokens=xusd \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
@@ -179,16 +179,16 @@ ixod_tx bonds buy 1000000000000xusd 1000000000001uixo "$XUSD_BOND_DID" "$MIGUEL_
 echo "Minting 1000000USD tokens to Francesco using the xUSD bond..."
 ixod_tx bonds buy 1000000000000xusd 1000000000001uixo "$XUSD_BOND_DID" "$FRANCESCO_DID_FULL"
 
-echo "Miguel buys 60000edu... [[founder allocation]]"
-ixod_tx bonds buy 60000edu 60000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
+echo "Miguel buys 1edu... [[founder allocation]]"
+ixod_tx bonds buy 1edu 1000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
-echo "Bond state is now open..."  # since 60000 (S0) reached
+echo "Bond state is now open..."  # since 1 (S0) reached
 ixod_q bonds bond "$BOND_DID"
 
-echo "Miguel buys 8682edu... [[Investment tranche 1 -- worth 30000xUSD]]"
-ixod_tx bonds buy 8682edu 30000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
+echo "Miguel buys 30edu... [[Investment tranche 1 -- worth approx. 30000xUSD]]"
+ixod_tx bonds buy 30edu 29790000001xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
@@ -196,8 +196,8 @@ echo "Changing public alpha 0.5->0.55..."
 NEW_ALPHA="0.55"
 ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 
-echo "Miguel buys 5639edu... [[Investment tranche 2 -- worth 10000xUSD]]"
-ixod_tx bonds buy 5639edu 10000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
+echo "Miguel buys 3edu... [[Investment tranche 2 -- worth approx. 10000xUSD]]"
+ixod_tx bonds buy 3edu 9513000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
@@ -205,8 +205,8 @@ echo "Changing public alpha 0.55->0.65..."
 NEW_ALPHA="0.65"
 ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 
-echo "Miguel buys 5631edu... [[Investment tranche 3 -- worth 10000xUSD]]"
-ixod_tx bonds buy 5631edu 10000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
+echo "Miguel buys 9edu... [[Investment tranche 3 -- worth approx. 10000xUSD]]"
+ixod_tx bonds buy 9edu 10597273093xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
@@ -214,8 +214,8 @@ echo "Changing public alpha 0.65->0.75..."
 NEW_ALPHA="0.75"
 ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 
-echo "Miguel buys 5619edu... [[Investment tranche 4 -- worth 10000xUSD]]"
-ixod_tx bonds buy 5619edu 10000000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
+echo "Miguel buys 8edu... [[Investment tranche 4 -- worth approx. 10000xUSD]]"
+ixod_tx bonds buy 8edu 9562071978xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
@@ -227,7 +227,7 @@ echo "Bond outcome payment reserve is now 68100xUSD..."
 ixod_q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
-ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
+ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --gas 300000
 echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
 ixod_q bonds bond "$BOND_DID"
 
