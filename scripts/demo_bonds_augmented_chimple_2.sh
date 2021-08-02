@@ -201,6 +201,13 @@ ixod_tx bonds buy 3edu 9513000000xusd "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
+echo "Francesco withdraws 30000xUSD to the reserve withdrawal address..."
+ixod_tx bonds withdraw-reserve "$BOND_DID" 30000000000xusd "$FRANCESCO_DID_FULL"
+echo "Reserve withdrawal account..."
+ixod_q bank balances "$RESERVE_OUT"
+echo "Available reserve has decreased..."
+ixod_q bonds available-reserve "$BOND_DID"
+
 echo "Changing public alpha 0.55->0.65..."
 NEW_ALPHA="0.65"
 ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
