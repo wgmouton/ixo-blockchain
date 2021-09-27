@@ -10,6 +10,8 @@ This is the official repository for the Sustainability Hub (ixo-Hub)
 
 ## Documentation
 - Guide for setting up a Relayer on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
+- Swagger API documentation for ixo modules gRPC endpoints can be found at [client/docs/swagger-ui/swagger.yaml](client/docs/swagger-ui/swagger.yaml)
+- Swagger API documentation for ixo modules legacy endpoints can be found at [client/docs/swagger-ui-legacy/swagger.yaml](client/docs/swagger-ui-legacy/swagger.yaml)
 - Blockchain Module Specifications can be found under `x/<module>/spec`
 
 ## Building and Running
@@ -43,4 +45,22 @@ bash ./scripts/demo_payments.sh  # Option 2
 bash ./scripts/demo_project.sh   # Option 3
 ...
 # Look in the scripts folder for more options!
+```
+
+- To re-generate `.pb.go` and `.pb.gw.go` files from `.proto` files, as well as docs/core/proto-docs.md:
+```bash
+make proto-gen
+```
+
+- To re-generate API documentation (`swagger.yaml` file):
+```bash
+make proto-swagger-gen
+```
+
+- To build and run the application using Starport (demos will not work if the
+  blockchain is started using this method, and the `./cmd/ixod` package has to
+  be refactored to `./cmd/ixo-blockchaind`):
+
+```bash
+starport serve
 ```

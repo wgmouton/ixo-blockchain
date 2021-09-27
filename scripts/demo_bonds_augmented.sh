@@ -21,8 +21,9 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-3"
+CHAIN_ID="pandora-4"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args

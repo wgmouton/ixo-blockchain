@@ -10,23 +10,11 @@ accounts:
 validator:
   name: alice
   staked: "100000000uixo"
-faucet:
-  name: bob
-  coins: [ "100000uixo" ]
-  port: 4500
-build:
-  binary: "ixod1"
-host:
-  rpc: ":26659"
-  p2p: ":26658"
-  prof: ":6061"
-  grpc: ":9091"
-  api: ":1318"
 init:
   app:
     minimum-gas-prices: "0.025uixo"
 genesis:
-  chain_id: "pandora-4.1"
+  chain_id: "pandora-4"
   app_state:
     staking:
       params:
