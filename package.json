@@ -2,7 +2,7 @@
   "scripts": {
     "prepare": "npx lefthook install",
     "test": "echo testing",
-    "lint": "echo linting",
+    "lint": "echo linting 2",
     "start": "skaffold dev",
     "start:local": "air src/main.go & wait",
     "build": "skaffold build"
