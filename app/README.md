@@ -2,9 +2,9 @@
 order: false
 ---
 
-# simapp
+# app
 
-simapp is an application built using the Cosmos SDK for testing and educational purposes.
+app is an application built using the Cosmos SDK for testing and educational purposes.
 
 ## Running testnets with `simd`
 
@@ -18,7 +18,7 @@ in this testnet.
 2. If you've run `simd` before, you may need to reset your database before starting a new
     testnet. You can reset your database with the following command: `$ ./simd unsafe-reset-all`.
 3. `$ ./simd init [moniker] --chain-id [chain-id]`. This will initialize a new working directory
-    at the default location `~/.simapp`. You need to provide a "moniker" and a "chain id". These
+    at the default location `~/.app`. You need to provide a "moniker" and a "chain id". These
     two names can be anything, but you will need to use the same "chain id" in the following steps.
 4. `$ ./simd keys add [key_name]`. This will create a new key, with a name of your choosing.
     Save the output of this command somewhere; you'll need the address generated here later.
@@ -34,10 +34,10 @@ in this testnet.
    single-validator genesis files).
 8. Once you've received the super genesis file, overwrite your original `genesis.json` file with
     the new super `genesis.json`.
-9. Modify your `config/config.toml` (in the simapp working directory) to include the other participants as
+9. Modify your `config/config.toml` (in the app working directory) to include the other participants as
     persistent peers:
 
-    ```text
+    ```
     # Comma separated list of nodes to keep persistent connections to
     persistent_peers = "[validator_address]@[ip_address]:[port],[validator_address]@[ip_address]:[port]"
     ```

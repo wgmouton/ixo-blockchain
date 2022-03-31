@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -16,7 +17,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -28,7 +28,6 @@ import (
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
-	group "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -39,16 +38,7 @@ import (
 func TestIxoAppExportAndBlockedAddrs(t *testing.T) {
 	encCfg := MakeTestEncodingConfig()
 	db := dbm.NewMemDB()
-	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewIxoAppWithCustomOptions(t, false, SetupOptions{
-		Logger:             logger,
-		DB:                 db,
-		InvCheckPeriod:     0,
-		EncConfig:          encCfg,
-		HomePath:           DefaultNodeHome,
-		SkipUpgradeHeights: map[int64]bool{},
-		AppOpts:            EmptyAppOptions{},
-	})
+	app := NewIxoApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 
 	for acc := range maccPerms {
 		require.True(
@@ -58,12 +48,22 @@ func TestIxoAppExportAndBlockedAddrs(t *testing.T) {
 		)
 	}
 
+	genesisState := NewDefaultGenesisState(encCfg.Marshaler)
+	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
+	require.NoError(t, err)
+
+	// Initialize the chain
+	app.InitChain(
+		abci.RequestInitChain{
+			Validators:    []abci.ValidatorUpdate{},
+			AppStateBytes: stateBytes,
+		},
+	)
 	app.Commit()
 
-	logger2, _ := log.NewDefaultLogger("plain", "info", false)
 	// Making a new app object with the db, so that initchain hasn't been called
-	app2 := NewIxoApp(logger2, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
-	_, err := app2.ExportAppStateAndValidators(false, []string{})
+	app2 := NewIxoApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
+	_, err = app2.ExportAppStateAndValidators(false, []string{})
 	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
 }
 
@@ -75,16 +75,15 @@ func TestGetMaccPerms(t *testing.T) {
 func TestRunMigrations(t *testing.T) {
 	db := dbm.NewMemDB()
 	encCfg := MakeTestEncodingConfig()
-	logger, _ := log.NewDefaultLogger("plain", "info", false)
+	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 	app := NewIxoApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 
 	// Create a new baseapp and configurator for the purpose of this test.
-	bApp := baseapp.NewBaseApp(appName, logger, db)
+	bApp := baseapp.NewBaseApp(appName, logger, db, encCfg.TxConfig.TxDecoder())
 	bApp.SetCommitMultiStoreTracer(nil)
 	bApp.SetInterfaceRegistry(encCfg.InterfaceRegistry)
-	msr := authmiddleware.NewMsgServiceRouter(encCfg.InterfaceRegistry)
 	app.BaseApp = bApp
-	app.configurator = module.NewConfigurator(app.appCodec, msr, app.GRPCQueryRouter())
+	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 
 	// We register all modules on the Configurator, except x/bank. x/bank will
 	// serve as the test subject on which we run the migration tests.
@@ -106,7 +105,7 @@ func TestRunMigrations(t *testing.T) {
 	testCases := []struct {
 		name         string
 		moduleName   string
-		fromVersion  uint64
+		forVersion   uint64
 		expRegErr    bool // errors while registering migration
 		expRegErrMsg string
 		expRunErr    bool // errors while running migration
@@ -124,17 +123,12 @@ func TestRunMigrations(t *testing.T) {
 			false, "", true, "no migrations found for module bank: not found", 0,
 		},
 		{
-			"can register 1->2 migration handler for x/bank, cannot run migration",
+			"can register and run migration handler for x/bank",
 			"bank", 1,
-			false, "", true, "no migration found for module bank from version 2 to version 3: not found", 0,
-		},
-		{
-			"can register 2->3 migration handler for x/bank, can run migration",
-			"bank", 2,
 			false, "", false, "", 1,
 		},
 		{
-			"cannot register migration handler for same module & fromVersion",
+			"cannot register migration handler for same module & forVersion",
 			"bank", 1,
 			true, "another migration for module bank and version 1 already exists: internal logic error", false, "", 0,
 		},
@@ -151,8 +145,8 @@ func TestRunMigrations(t *testing.T) {
 			called := 0
 
 			if tc.moduleName != "" {
-				// Register migration for module from version `fromVersion` to `fromVersion+1`.
-				err = app.configurator.RegisterMigration(tc.moduleName, tc.fromVersion, func(sdk.Context) error {
+				// Register migration for module from version `forVersion` to `forVersion+1`.
+				err = app.configurator.RegisterMigration(tc.moduleName, tc.forVersion, func(sdk.Context) error {
 					called++
 
 					return nil
@@ -180,7 +174,6 @@ func TestRunMigrations(t *testing.T) {
 					"distribution": distribution.AppModule{}.ConsensusVersion(),
 					"slashing":     slashing.AppModule{}.ConsensusVersion(),
 					"gov":          gov.AppModule{}.ConsensusVersion(),
-					"group":        group.AppModule{}.ConsensusVersion(),
 					"params":       params.AppModule{}.ConsensusVersion(),
 					"upgrade":      upgrade.AppModule{}.ConsensusVersion(),
 					"vesting":      vesting.AppModule{}.ConsensusVersion(),
@@ -205,7 +198,7 @@ func TestRunMigrations(t *testing.T) {
 func TestInitGenesisOnMigration(t *testing.T) {
 	db := dbm.NewMemDB()
 	encCfg := MakeTestEncodingConfig()
-	logger, _ := log.NewDefaultLogger("plain", "info", false)
+	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 	app := NewIxoApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 
@@ -249,16 +242,18 @@ func TestInitGenesisOnMigration(t *testing.T) {
 func TestUpgradeStateOnGenesis(t *testing.T) {
 	encCfg := MakeTestEncodingConfig()
 	db := dbm.NewMemDB()
-	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewIxoAppWithCustomOptions(t, false, SetupOptions{
-		Logger:             logger,
-		DB:                 db,
-		InvCheckPeriod:     0,
-		EncConfig:          encCfg,
-		HomePath:           DefaultNodeHome,
-		SkipUpgradeHeights: map[int64]bool{},
-		AppOpts:            EmptyAppOptions{},
-	})
+	app := NewIxoApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
+	genesisState := NewDefaultGenesisState(encCfg.Marshaler)
+	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
+	require.NoError(t, err)
+
+	// Initialize the chain
+	app.InitChain(
+		abci.RequestInitChain{
+			Validators:    []abci.ValidatorUpdate{},
+			AppStateBytes: stateBytes,
+		},
+	)
 
 	// make sure the upgrade keeper has version map in state
 	ctx := app.NewContext(false, tmproto.Header{})

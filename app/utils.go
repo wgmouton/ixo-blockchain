@@ -3,17 +3,17 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"io/ioutil"
 
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/ixofoundation/ixo-blockchain/app/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/ixofoundation/ixo-blockchain/app/helpers"
 )
 
 // SetupSimulation creates the config, db (levelDB), temporary directory and logger for
@@ -25,7 +25,7 @@ func SetupSimulation(dirPrefix, dbName string) (simtypes.Config, dbm.DB, string,
 	}
 
 	config := NewConfigFromFlags()
-	config.ChainID = helpers.SimAppChainID
+	config.ChainID = helpers.IxoAppChainID
 
 	var logger log.Logger
 	if FlagVerboseValue {
@@ -34,7 +34,7 @@ func SetupSimulation(dirPrefix, dbName string) (simtypes.Config, dbm.DB, string,
 		logger = log.NewNopLogger()
 	}
 
-	dir, err := os.MkdirTemp("", dirPrefix)
+	dir, err := ioutil.TempDir("", dirPrefix)
 	if err != nil {
 		return simtypes.Config{}, nil, "", nil, false, err
 	}
@@ -56,7 +56,7 @@ func SimulationOperations(app App, cdc codec.JSONCodec, config simtypes.Config) 
 	}
 
 	if config.ParamsFile != "" {
-		bz, err := os.ReadFile(config.ParamsFile)
+		bz, err := ioutil.ReadFile(config.ParamsFile)
 		if err != nil {
 			panic(err)
 		}
@@ -84,7 +84,7 @@ func CheckExportSimulation(
 			return err
 		}
 
-		if err := os.WriteFile(config.ExportStatePath, []byte(exported.AppState), 0600); err != nil {
+		if err := ioutil.WriteFile(config.ExportStatePath, []byte(exported.AppState), 0600); err != nil {
 			return err
 		}
 	}
@@ -96,7 +96,7 @@ func CheckExportSimulation(
 			return err
 		}
 
-		if err := os.WriteFile(config.ExportParamsPath, paramsBz, 0600); err != nil {
+		if err := ioutil.WriteFile(config.ExportParamsPath, paramsBz, 0600); err != nil {
 			return err
 		}
 	}

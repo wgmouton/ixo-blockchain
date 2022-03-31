@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
-	"os"
 	"time"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -13,13 +13,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	ixoappparams "github.com/ixofoundation/ixo-blockchain/app/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	appparams "github.com/ixofoundation/ixo-blockchain/app/params"
 )
 
 // AppStateFn returns the initial application state using a genesis or the simulation parameters.
@@ -41,7 +41,7 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 			panic("cannot provide both a genesis file and a params file")
 
 		case config.GenesisFile != "":
-			// override the default chain-id from ixoapp to set it later to the config
+			// override the default chain-id from app to set it later to the config
 			genesisDoc, accounts := AppStateFromGenesisFileFn(r, cdc, config.GenesisFile)
 
 			if FlagGenesisTimeValue == 0 {
@@ -55,7 +55,7 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 
 		case config.ParamsFile != "":
 			appParams := make(simtypes.AppParams)
-			bz, err := os.ReadFile(config.ParamsFile)
+			bz, err := ioutil.ReadFile(config.ParamsFile)
 			if err != nil {
 				panic(err)
 			}
@@ -149,11 +149,11 @@ func AppStateRandomizedFn(
 	// number of bonded accounts
 	var initialStake, numInitiallyBonded int64
 	appParams.GetOrGenerate(
-		cdc, ixoappparams.StakePerAccount, &initialStake, r,
+		cdc, appparams.StakePerAccount, &initialStake, r,
 		func(r *rand.Rand) { initialStake = r.Int63n(1e12) },
 	)
 	appParams.GetOrGenerate(
-		cdc, ixoappparams.InitiallyBondedValidators, &numInitiallyBonded, r,
+		cdc, appparams.InitiallyBondedValidators, &numInitiallyBonded, r,
 		func(r *rand.Rand) { numInitiallyBonded = int64(r.Intn(300)) },
 	)
 
@@ -194,7 +194,7 @@ func AppStateRandomizedFn(
 // AppStateFromGenesisFileFn util function to generate the genesis AppState
 // from a genesis.json file.
 func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile string) (tmtypes.GenesisDoc, []simtypes.Account) {
-	bytes, err := os.ReadFile(genesisFile)
+	bytes, err := ioutil.ReadFile(genesisFile)
 	if err != nil {
 		panic(err)
 	}

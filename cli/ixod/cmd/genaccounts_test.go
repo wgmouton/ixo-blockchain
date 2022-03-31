@@ -3,10 +3,12 @@ package cmd_test
 import (
 	"context"
 	"fmt"
+	"testing"
+
+	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"testing"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -15,12 +17,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	simcmd "github.com/cosmos/cosmos-sdk/simapp/simd/cmd"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltest "github.com/cosmos/cosmos-sdk/x/genutil/client/testutil"
+	ixocmd "github.com/ixofoundation/ixo-blockchain/cli/ixod/cmd"
 )
 
 var testMbm = module.NewBasicManager(genutil.AppModuleBasic{})
@@ -72,7 +73,7 @@ func TestAddGenesisAccountCmd(t *testing.T) {
 			cfg, err := genutiltest.CreateDefaultTendermintConfig(home)
 			require.NoError(t, err)
 
-			appCodec := simapp.MakeTestEncodingConfig().Codec
+			appCodec := app.MakeTestEncodingConfig().Marshaler
 			err = genutiltest.ExecInitCmd(testMbm, home, appCodec)
 			require.NoError(t, err)
 
@@ -81,7 +82,7 @@ func TestAddGenesisAccountCmd(t *testing.T) {
 
 			if tc.withKeyring {
 				path := hd.CreateHDPath(118, 0, 0).String()
-				kr, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendMemory, home, nil, appCodec)
+				kr, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendMemory, home, nil)
 				require.NoError(t, err)
 				_, _, err = kr.NewMnemonic(tc.addr, keyring.English, path, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 				require.NoError(t, err)
@@ -92,7 +93,7 @@ func TestAddGenesisAccountCmd(t *testing.T) {
 			ctx = context.WithValue(ctx, client.ClientContextKey, &clientCtx)
 			ctx = context.WithValue(ctx, server.ServerContextKey, serverCtx)
 
-			cmd := simcmd.AddGenesisAccountCmd(home)
+			cmd := ixocmd.AddGenesisAccountCmd(home)
 			cmd.SetArgs([]string{
 				tc.addr,
 				tc.denom,
