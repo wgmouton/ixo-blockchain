@@ -8,6 +8,7 @@ import (
 
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/ixofoundation/ixo-blockchain/app"
+	"github.com/ixofoundation/ixo-blockchain/cli/ixod/cmd/didsign"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
@@ -139,6 +140,9 @@ lru_size = 0`
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
+	cfg.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
+	cfg.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
 	cfg.Seal()
 
 	rootCmd.AddCommand(
@@ -208,6 +212,7 @@ func txCommand() *cobra.Command {
 
 	cmd.AddCommand(
 		authcmd.GetSignCommand(),
+		didsign.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
 		authcmd.GetMultiSignBatchCmd(),

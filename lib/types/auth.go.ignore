@@ -276,7 +276,10 @@ func SignAndBroadcastTxFromStdSignMsg(clientCtx client.Context,
 	}
 
 	// broadcast to a Tendermint node
-	res, err := clientCtx.BroadcastTx(txBytes)
+	res, err := clientCtx.Bro
+  
+  
+adcastTx(txBytes)
 	if err != nil {
 		return &sdk.TxResponse{}, err
 	}
