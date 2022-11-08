@@ -298,6 +298,7 @@ func NewIxoApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		feegrant.StoreKey,
 
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
@@ -913,6 +914,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(feegrant.ModuleName)
 
 	// init params keeper and subspaces (for custom ixo modules)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
