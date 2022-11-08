@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -55,9 +53,7 @@ func NewDefaultAnteHandler(
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	pubKeyGetter PubKeyGetter,
 	signModeHandler authsigning.SignModeHandler,
-	txCounterStoreKey sdk.StoreKey,
 	channelKeeper *channelkeeper.Keeper,
-	wasmConfig wasmTypes.WasmConfig,
 ) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
@@ -97,9 +93,7 @@ func NewDefaultAnteHandler(
 	//   instead of from the messages' GetSigners() function.
 
 	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(),                                          // outermost AnteDecorator. SetUpContext must be called
-		wasmkeeper.NewLimitSimulationGasDecorator(wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
-		wasmkeeper.NewCountTXDecorator(txCounterStoreKey),
+		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called after setup context to enforce limits early
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(ak),
