@@ -11,12 +11,12 @@ import (
 
 // RegisterInvariants registers all supply invariants
 func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
-	ir.RegisterRoute(types.ModuleName, "bonds-supply",
-		SupplyInvariant(k))
-	ir.RegisterRoute(types.ModuleName, "bonds-reserve",
-		ReserveInvariant(k))
-	ir.RegisterRoute(types.ModuleName, "bonds-available-reserve",
-		AvailableReserveInvariant(k))
+	// ir.RegisterRoute(types.ModuleName, "bonds-supply",
+	// 	SupplyInvariant(k))
+	// ir.RegisterRoute(types.ModuleName, "bonds-reserve",
+	// 	ReserveInvariant(k))
+	// ir.RegisterRoute(types.ModuleName, "bonds-available-reserve",
+	// 	AvailableReserveInvariant(k))
 }
 
 // AllInvariants runs all invariants of the bonds module.
